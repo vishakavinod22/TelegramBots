@@ -140,6 +140,7 @@ public abstract class BaseAbilityBot extends DefaultAbsSender implements Ability
 
     public abstract long creatorId();
 
+    //Done AbilityBoyI18Test
     protected BaseAbilityBot(String botToken, String botUsername, DBContext db, AbilityToggle toggle, DefaultBotOptions botOptions) {
         super(botOptions, botToken);
 
@@ -154,6 +155,7 @@ public abstract class BaseAbilityBot extends DefaultAbsSender implements Ability
         registerAbilities();
         initStats();
     }
+    //Done AbilityBoyI18Test
 
     /**
      * @return the database of this bot
@@ -214,6 +216,7 @@ public abstract class BaseAbilityBot extends DefaultAbsSender implements Ability
     /**
      * @return the immutable map of <String,Ability>
      */
+    //Done AbilityBoyI18Test
     public Map<String, Ability> abilities() {
         return abilities;
     }
@@ -343,6 +346,7 @@ public abstract class BaseAbilityBot extends DefaultAbsSender implements Ability
      * <b>Only abilities and replies with the <u>public</u> accessor are registered!</b>
      */
     private void registerAbilities() {
+        //Done AbilityBoyI18Test
         try {
             // Collect all classes that implement AbilityExtension declared in the bot
             extensions.addAll(stream(getClass().getMethods())

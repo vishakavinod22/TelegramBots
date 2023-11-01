@@ -33,10 +33,12 @@ public class TelegramFileDownloader {
         httpClient = HttpClients.createDefault();
     }
 
+    //Done AbilityBoyI18Test
     public TelegramFileDownloader(final HttpClient httpClient, final Supplier<String> botTokenSupplier) {
         this.httpClient = httpClient;
         this.botTokenSupplier = botTokenSupplier;
     }
+    //Done AbilityBoyI18Test
 
     public final java.io.File downloadFile(String filePath) throws TelegramApiException {
         String tempFileName = Long.toString(System.currentTimeMillis());

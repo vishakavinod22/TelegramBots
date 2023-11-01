@@ -66,6 +66,7 @@ import static org.telegram.telegrambots.Constants.SOCKET_TIMEOUT;
  */
 @SuppressWarnings({"unused", "SameParameterValue"})
 @Slf4j
+//Done AbilityBoyI18Test
 public abstract class DefaultAbsSender extends AbsSender {
     private static final ContentType TEXT_PLAIN_CONTENT_TYPE = ContentType.create("text/plain", StandardCharsets.UTF_8);
 
@@ -76,7 +77,7 @@ public abstract class DefaultAbsSender extends AbsSender {
     private final RequestConfig requestConfig;
     private final TelegramFileDownloader telegramFileDownloader;
     private final String botToken;
-
+//Done AbilityBoyI18Test
     /**
      * If this is used getBotToken has to be overridden in order to return the bot token!
      * @deprecated Overwriting the getBotToken() method is deprecated. Use the constructor instead
@@ -86,6 +87,7 @@ public abstract class DefaultAbsSender extends AbsSender {
         this(options, null);
     }
 
+    //Done AbilityBoyI18Test
     protected DefaultAbsSender(DefaultBotOptions options, String botToken) {
         super();
         this.botToken = botToken;
@@ -107,6 +109,7 @@ public abstract class DefaultAbsSender extends AbsSender {
                     .setConnectionRequestTimeout(SOCKET_TIMEOUT).build();
         }
     }
+    //Done AbilityBoyI18Test
 
     /**
      * Returns the token of the bot to be able to perform Telegram Api Requests

@@ -79,12 +79,14 @@ public final class DefaultAbilities implements AbilityExtension {
   public static final String COMMANDS = "commands";
   public static final String REPORT = "report";
   public static final String STATS = "stats";
+    //Done AbilityBoyI18Test
   private static final Logger log = LoggerFactory.getLogger(DefaultAbilities.class);
   private final BaseAbilityBot bot;
 
   public DefaultAbilities(BaseAbilityBot bot) {
     this.bot = bot;
   }
+    //Done AbilityBoyI18Test
 
   /**
    * <p>
@@ -102,6 +104,7 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to report commands defined by the child bot.
    */
+  //Done AbilityBoyI18Test
   public Ability reportCommands() {
     return builder()
         .name(REPORT)
@@ -111,11 +114,11 @@ public final class DefaultAbilities implements AbilityExtension {
         .action(ctx -> {
           String commands = bot.abilities().values().stream()
               .filter(ability -> nonNull(ability.info()))
-              .map(ability -> {
+              .map(ability -> {    //Done AbilityBoyI18Test
                 String name = ability.name();
                 String info = ability.info();
                 return format("%s - %s", name, info);
-              })
+              })    //Done AbilityBoyI18Test
               .sorted()
               .reduce((a, b) -> format("%s%n%s", a, b))
               .orElse(getLocalizedMessage(ABILITY_COMMANDS_NOT_FOUND, ctx.user().getLanguageCode()));
@@ -124,6 +127,7 @@ public final class DefaultAbilities implements AbilityExtension {
         })
         .build();
   }
+    //Done AbilityBoyI18Test
 
   /**
    * Default format:
@@ -142,13 +146,14 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to print commands based on the privacy of the requesting user
    */
+  //Done AbilityBoyI18Test
   public Ability commands() {
     return builder()
         .name(COMMANDS)
         .locality(USER)
         .privacy(PUBLIC)
         .input(0)
-        .action(ctx -> {
+        .action(ctx -> {    //Done AbilityBoyI18Test
           Privacy privacy = bot.getPrivacy(ctx.update(), ctx.user().getId());
 
           ListMultimap<Privacy, String> abilitiesPerPrivacy = bot.abilities().values().stream()
@@ -185,13 +190,14 @@ public final class DefaultAbilities implements AbilityExtension {
   /**
    * @return the ability to report statistics for abilities and replies.
    */
+  //Done AbilityBoyI18Test
   public Ability reportStats() {
     return builder()
         .name(STATS)
         .locality(ALL)
         .privacy(ADMIN)
         .input(0)
-        .action(ctx -> {
+        .action(ctx -> {    //Done AbilityBoyI18Test
           String stats = bot.stats().entrySet().stream()
               .map(entry -> String.format("%s: %d", entry.getKey(), entry.getValue().hits()))
               .reduce(new StringJoiner("\n"), StringJoiner::add, StringJoiner::merge)
@@ -211,13 +217,14 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to back-up the database of the bot
    */
+  //Done AbilityBoyI18Test
   public Ability backupDB() {
     return builder()
         .name(BACKUP)
         .locality(USER)
         .privacy(CREATOR)
         .input(0)
-        .action(ctx -> {
+        .action(ctx -> {   //Done AbilityBoyI18Test
           File backup = new File("backup.json");
 
           try (PrintStream printStream = new PrintStream(backup)) {
@@ -246,15 +253,16 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to recover the database of the bot
    */
+  //Done AbilityBoyI18Test
   public Ability recoverDB() {
     return builder()
         .name(RECOVER)
         .locality(USER)
         .privacy(CREATOR)
         .input(0)
-        .action(ctx -> bot.silent.forceReply(
+        .action(ctx -> bot.silent.forceReply(   //Done AbilityBoyI18Test
             getLocalizedMessage(ABILITY_RECOVER_MESSAGE, ctx.user().getLanguageCode()), ctx.chatId()))
-        .reply((bot, update) -> {
+        .reply((bot, update) -> {    //Done AbilityBoyI18Test
           String replyToMsg = update.getMessage().getReplyToMessage().getText();
           String recoverMessage = getLocalizedMessage(ABILITY_RECOVER_MESSAGE, AbilityUtils.getUser(update).getLanguageCode());
           if (!replyToMsg.equals(recoverMessage))
@@ -285,13 +293,14 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to ban the user from any kind of <b>bot interaction</b>
    */
+  //Done AbilityBoyI18Test
   public Ability banUser() {
     return builder()
         .name(BAN)
         .locality(ALL)
         .privacy(ADMIN)
         .input(1)
-        .action(ctx -> {
+        .action(ctx -> {   //Done AbilityBoyI18Test
           String username = stripTag(ctx.firstArg());
           long userId = getUserIdSendError(username, ctx);
           String bannedUser;
@@ -320,13 +329,14 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to unban a user
    */
+  //Done AbilityBoyI18Test
   public Ability unbanUser() {
     return builder()
         .name(UNBAN)
         .locality(ALL)
         .privacy(ADMIN)
         .input(1)
-        .action(ctx -> {
+        .action(ctx -> {    //Done AbilityBoyI18Test
           String username = stripTag(ctx.firstArg());
           Long userId = getUserIdSendError(username, ctx);
 
@@ -344,13 +354,14 @@ public final class DefaultAbilities implements AbilityExtension {
   /**
    * @return the ability to promote a user to a bot admin
    */
+  //Done AbilityBoyI18Test
   public Ability promoteAdmin() {
     return builder()
         .name(PROMOTE)
         .locality(ALL)
         .privacy(ADMIN)
         .input(1)
-        .action(ctx -> {
+        .action(ctx -> {   //Done AbilityBoyI18Test
           String username = stripTag(ctx.firstArg());
           Long userId = getUserIdSendError(username, ctx);
 
@@ -368,13 +379,14 @@ public final class DefaultAbilities implements AbilityExtension {
   /**
    * @return the ability to demote an admin to a user
    */
+  //Done AbilityBoyI18Test
   public Ability demoteAdmin() {
     return builder()
         .name(DEMOTE)
         .locality(ALL)
         .privacy(ADMIN)
         .input(1)
-        .action(ctx -> {
+        .action(ctx -> {  //Done AbilityBoyI18Test
           String username = stripTag(ctx.firstArg());
           Long userId = getUserIdSendError(username, ctx);
 
@@ -393,13 +405,14 @@ public final class DefaultAbilities implements AbilityExtension {
    *
    * @return the ability to claim yourself as the master and creator of the bot
    */
+  //Done AbilityBoyI18Test
   public Ability claimCreator() {
     return builder()
         .name(CLAIM)
         .locality(ALL)
         .privacy(CREATOR)
         .input(0)
-        .action(ctx -> {
+        .action(ctx -> {   //Done AbilityBoyI18Test
           Set<Long> admins = bot.admins();
           long id = bot.creatorId();
 

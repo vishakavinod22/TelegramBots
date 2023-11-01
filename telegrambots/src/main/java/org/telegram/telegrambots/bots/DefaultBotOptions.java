@@ -32,6 +32,7 @@ public class DefaultBotOptions implements BotOptions {
     private int getUpdatesTimeout;
     private int getUpdatesLimit;
 
+    //Done AbilityBoyI18Test
     public enum ProxyType {
         NO_PROXY,
         HTTP,
@@ -47,6 +48,7 @@ public class DefaultBotOptions implements BotOptions {
         getUpdatesTimeout = ApiConstants.GETUPDATES_TIMEOUT;
         getUpdatesLimit = 100;
     }
+    //Done AbilityBoyI18Test
 
     @Override
     public String getBaseUrl() {
@@ -61,6 +63,7 @@ public class DefaultBotOptions implements BotOptions {
         this.maxThreads = maxThreads;
     }
 
+    //Done AbilityBoyI18Test
     public int getMaxThreads() {
         return maxThreads;
     }
@@ -68,6 +71,7 @@ public class DefaultBotOptions implements BotOptions {
     public RequestConfig getRequestConfig() {
         return requestConfig;
     }
+    //Done AbilityBoyI18Test
 
     public Integer getMaxWebhookConnections() {
         return maxWebhookConnections;
@@ -113,9 +117,11 @@ public class DefaultBotOptions implements BotOptions {
         this.backOff = BackOff;
     }
 
+    //Done AbilityBoyI18Test
     public ProxyType getProxyType() {
         return proxyType;
     }
+    //Done AbilityBoyI18Test
 
     public void setProxyType(ProxyType proxyType) {
         this.proxyType = proxyType;

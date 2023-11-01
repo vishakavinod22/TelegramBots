@@ -34,9 +34,11 @@ import java.util.concurrent.CompletableFuture;
  * @version 1.0
  */
 @SuppressWarnings("unused")
+//Done AbilityBoyI18Test
 public abstract class AbsSender {
     protected AbsSender() {
     }
+    //Done AbilityBoyI18Test
 
     // General methods to execute BotApiMethods
 

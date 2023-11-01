@@ -1,0 +1,583 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > DefaultAbilities</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">org.telegram.abilitybots.api.bot</a>
+</div>
+
+<h1>Coverage Summary for Class: DefaultAbilities (org.telegram.abilitybots.api.bot)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">DefaultAbilities</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.1%
+  </span>
+  <span class="absValue">
+    (33/34)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    90.5%
+  </span>
+  <span class="absValue">
+    (171/189)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package org.telegram.abilitybots.api.bot;
+&nbsp;
+&nbsp;import com.google.common.collect.ListMultimap;
+&nbsp;import com.google.common.collect.Multimap;
+&nbsp;import org.apache.commons.io.IOUtils;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.telegram.abilitybots.api.db.DBContext;
+&nbsp;import org.telegram.abilitybots.api.objects.Ability;
+&nbsp;import org.telegram.abilitybots.api.objects.MessageContext;
+&nbsp;import org.telegram.abilitybots.api.objects.Privacy;
+&nbsp;import org.telegram.abilitybots.api.util.AbilityExtension;
+&nbsp;import org.telegram.abilitybots.api.util.AbilityUtils;
+&nbsp;import org.telegram.abilitybots.api.util.Pair;
+&nbsp;import org.telegram.telegrambots.meta.api.methods.GetFile;
+&nbsp;import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
+&nbsp;import org.telegram.telegrambots.meta.api.objects.InputFile;
+&nbsp;import org.telegram.telegrambots.meta.api.objects.Message;
+&nbsp;import org.telegram.telegrambots.meta.api.objects.Update;
+&nbsp;import org.telegram.telegrambots.meta.api.objects.User;
+&nbsp;import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+&nbsp;
+&nbsp;import java.io.File;
+&nbsp;import java.io.FileNotFoundException;
+&nbsp;import java.io.FileReader;
+&nbsp;import java.io.PrintStream;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.Set;
+&nbsp;import java.util.StringJoiner;
+&nbsp;
+&nbsp;import static com.google.common.base.Strings.isNullOrEmpty;
+&nbsp;import static com.google.common.collect.MultimapBuilder.hashKeys;
+&nbsp;import static java.lang.String.format;
+&nbsp;import static java.util.Comparator.comparing;
+&nbsp;import static java.util.Objects.nonNull;
+&nbsp;import static java.util.stream.Collectors.joining;
+&nbsp;import static org.apache.commons.lang3.StringUtils.isEmpty;
+&nbsp;import static org.telegram.abilitybots.api.objects.Ability.builder;
+&nbsp;import static org.telegram.abilitybots.api.objects.Flag.DOCUMENT;
+&nbsp;import static org.telegram.abilitybots.api.objects.Flag.MESSAGE;
+&nbsp;import static org.telegram.abilitybots.api.objects.Flag.REPLY;
+&nbsp;import static org.telegram.abilitybots.api.objects.Locality.ALL;
+&nbsp;import static org.telegram.abilitybots.api.objects.Locality.USER;
+&nbsp;import static org.telegram.abilitybots.api.objects.Privacy.ADMIN;
+&nbsp;import static org.telegram.abilitybots.api.objects.Privacy.CREATOR;
+&nbsp;import static org.telegram.abilitybots.api.objects.Privacy.PUBLIC;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_BAN_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_BAN_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_CLAIM_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_CLAIM_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_COMMANDS_NOT_FOUND;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_DEMOTE_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_DEMOTE_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_PROMOTE_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_PROMOTE_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_RECOVER_ERROR;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_RECOVER_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_RECOVER_MESSAGE;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_RECOVER_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_UNBAN_FAIL;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.ABILITY_UNBAN_SUCCESS;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityMessageCodes.USER_NOT_FOUND;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityUtils.addTag;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityUtils.escape;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityUtils.getLocalizedMessage;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityUtils.shortName;
+&nbsp;import static org.telegram.abilitybots.api.util.AbilityUtils.stripTag;
+&nbsp;
+&nbsp;public final class DefaultAbilities implements AbilityExtension {
+&nbsp;  // Default commands
+&nbsp;  public static final String CLAIM = &quot;claim&quot;;
+&nbsp;  public static final String BAN = &quot;ban&quot;;
+&nbsp;  public static final String PROMOTE = &quot;promote&quot;;
+&nbsp;  public static final String DEMOTE = &quot;demote&quot;;
+&nbsp;  public static final String UNBAN = &quot;unban&quot;;
+&nbsp;  public static final String BACKUP = &quot;backup&quot;;
+&nbsp;  public static final String RECOVER = &quot;recover&quot;;
+&nbsp;  public static final String COMMANDS = &quot;commands&quot;;
+&nbsp;  public static final String REPORT = &quot;report&quot;;
+&nbsp;  public static final String STATS = &quot;stats&quot;;
+<b class="fc">&nbsp;  private static final Logger log = LoggerFactory.getLogger(DefaultAbilities.class);</b>
+&nbsp;  private final BaseAbilityBot bot;
+&nbsp;
+<b class="fc">&nbsp;  public DefaultAbilities(BaseAbilityBot bot) {</b>
+<b class="fc">&nbsp;    this.bot = bot;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Format of the report:
+&nbsp;   * &lt;p&gt;
+&nbsp;   * [command1] - [description1]
+&nbsp;   * &lt;p&gt;
+&nbsp;   * [command2] - [description2]
+&nbsp;   * &lt;p&gt;
+&nbsp;   * ...
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Once you invoke it, the bot will send the available commands to the chat. This is a public ability so anyone can invoke it.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Usage: &lt;code&gt;/commands&lt;/code&gt;
+&nbsp;   *
+&nbsp;   * @return the ability to report commands defined by the child bot.
+&nbsp;   */
+&nbsp;  public Ability reportCommands() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(REPORT)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(CREATOR)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String commands = bot.abilities().values().stream()</b>
+<b class="fc">&nbsp;              .filter(ability -&gt; nonNull(ability.info()))</b>
+<b class="fc">&nbsp;              .map(ability -&gt; {</b>
+<b class="fc">&nbsp;                String name = ability.name();</b>
+<b class="fc">&nbsp;                String info = ability.info();</b>
+<b class="fc">&nbsp;                return format(&quot;%s - %s&quot;, name, info);</b>
+&nbsp;              })
+<b class="fc">&nbsp;              .sorted()</b>
+<b class="fc">&nbsp;              .reduce((a, b) -&gt; format(&quot;%s%n%s&quot;, a, b))</b>
+<b class="fc">&nbsp;              .orElse(getLocalizedMessage(ABILITY_COMMANDS_NOT_FOUND, ctx.user().getLanguageCode()));</b>
+&nbsp;
+<b class="fc">&nbsp;          bot.silent.send(commands, ctx.chatId());</b>
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Default format:
+&nbsp;   * &lt;p&gt;
+&nbsp;   * PUBLIC
+&nbsp;   * &lt;p&gt;
+&nbsp;   * [command1] - [description1]
+&nbsp;   * &lt;p&gt;
+&nbsp;   * [command2] - [description2]
+&nbsp;   * &lt;p&gt;
+&nbsp;   * GROUP_ADMIN
+&nbsp;   * &lt;p&gt;
+&nbsp;   * [command1] - [description1]
+&nbsp;   * &lt;p&gt;
+&nbsp;   * ...
+&nbsp;   *
+&nbsp;   * @return the ability to print commands based on the privacy of the requesting user
+&nbsp;   */
+&nbsp;  public Ability commands() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(COMMANDS)</b>
+<b class="fc">&nbsp;        .locality(USER)</b>
+<b class="fc">&nbsp;        .privacy(PUBLIC)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          Privacy privacy = bot.getPrivacy(ctx.update(), ctx.user().getId());</b>
+&nbsp;
+<b class="fc">&nbsp;          ListMultimap&lt;Privacy, String&gt; abilitiesPerPrivacy = bot.abilities().values().stream()</b>
+<b class="fc">&nbsp;              .map(ability -&gt; {</b>
+<b class="fc">&nbsp;                String name = ability.name();</b>
+<b class="fc">&nbsp;                String info = ability.info();</b>
+&nbsp;
+<b class="fc">&nbsp;                if (!isEmpty(info))</b>
+<b class="fc">&nbsp;                  return Pair.of(ability.privacy(), format(&quot;/%s - %s&quot;, name, info));</b>
+<b class="fc">&nbsp;                return Pair.of(ability.privacy(), format(&quot;/%s&quot;, name));</b>
+&nbsp;              })
+<b class="fc">&nbsp;              .sorted(comparing(Pair::b))</b>
+<b class="fc">&nbsp;              .collect(() -&gt; hashKeys().arrayListValues().build(),</b>
+<b class="fc">&nbsp;                  (map, pair) -&gt; map.put(pair.a(), pair.b()),</b>
+&nbsp;                  Multimap::putAll);
+&nbsp;
+<b class="fc">&nbsp;          String commands = abilitiesPerPrivacy.asMap().entrySet().stream()</b>
+<b class="fc">&nbsp;              .filter(entry -&gt; privacy.compareTo(entry.getKey()) &gt;= 0)</b>
+<b class="fc">&nbsp;              .sorted(comparing(Map.Entry::getKey))</b>
+<b class="fc">&nbsp;              .map(entry -&gt;</b>
+<b class="fc">&nbsp;                  entry.getValue().stream()</b>
+<b class="fc">&nbsp;                      .reduce(entry.getKey().toString(), (a, b) -&gt; format(&quot;%s\n%s&quot;, a, b))</b>
+&nbsp;              )
+<b class="fc">&nbsp;              .collect(joining(&quot;\n&quot;));</b>
+&nbsp;
+<b class="fc">&nbsp;          if (commands.isEmpty())</b>
+<b class="nc">&nbsp;            commands = getLocalizedMessage(ABILITY_COMMANDS_NOT_FOUND, ctx.user().getLanguageCode());</b>
+&nbsp;
+<b class="fc">&nbsp;          bot.silent.send(commands, ctx.chatId());</b>
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * @return the ability to report statistics for abilities and replies.
+&nbsp;   */
+&nbsp;  public Ability reportStats() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(STATS)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(ADMIN)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String stats = bot.stats().entrySet().stream()</b>
+<b class="fc">&nbsp;              .map(entry -&gt; String.format(&quot;%s: %d&quot;, entry.getKey(), entry.getValue().hits()))</b>
+<b class="fc">&nbsp;              .reduce(new StringJoiner(&quot;\n&quot;), StringJoiner::add, StringJoiner::merge)</b>
+<b class="fc">&nbsp;              .toString();</b>
+&nbsp;
+<b class="fc">&nbsp;          bot.silent.send(stats, ctx.chatId());</b>
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * This backup ability returns the object defined by {@link DBContext#backup()} as a message document.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * This is a high-profile ability and is restricted to the CREATOR only.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Usage: &lt;code&gt;/backup&lt;/code&gt;
+&nbsp;   *
+&nbsp;   * @return the ability to back-up the database of the bot
+&nbsp;   */
+&nbsp;  public Ability backupDB() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(BACKUP)</b>
+<b class="fc">&nbsp;        .locality(USER)</b>
+<b class="fc">&nbsp;        .privacy(CREATOR)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          File backup = new File(&quot;backup.json&quot;);</b>
+&nbsp;
+<b class="fc">&nbsp;          try (PrintStream printStream = new PrintStream(backup)) {</b>
+<b class="fc">&nbsp;            printStream.print(bot.db.backup());</b>
+<b class="fc">&nbsp;            bot.sender.sendDocument(SendDocument.builder()</b>
+<b class="fc">&nbsp;                    .document(new InputFile(backup))</b>
+<b class="fc">&nbsp;                    .chatId(ctx.chatId())</b>
+<b class="fc">&nbsp;                    .build()</b>
+&nbsp;            );
+<b class="fc">&nbsp;          } catch (FileNotFoundException e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Error while fetching backup&quot;, e);</b>
+<b class="nc">&nbsp;          } catch (TelegramApiException e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Error while sending document/backup file&quot;, e);</b>
+<b class="fc">&nbsp;          }</b>
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Recovers the bot database using {@link DBContext#recover(Object)}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * The bot recovery process hugely depends on the implementation of the recovery method of {@link DBContext}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Usage: &lt;code&gt;/recover&lt;/code&gt;
+&nbsp;   *
+&nbsp;   * @return the ability to recover the database of the bot
+&nbsp;   */
+&nbsp;  public Ability recoverDB() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(RECOVER)</b>
+<b class="fc">&nbsp;        .locality(USER)</b>
+<b class="fc">&nbsp;        .privacy(CREATOR)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; bot.silent.forceReply(</b>
+<b class="nc">&nbsp;            getLocalizedMessage(ABILITY_RECOVER_MESSAGE, ctx.user().getLanguageCode()), ctx.chatId()))</b>
+<b class="fc">&nbsp;        .reply((bot, update) -&gt; {</b>
+<b class="fc">&nbsp;          String replyToMsg = update.getMessage().getReplyToMessage().getText();</b>
+<b class="fc">&nbsp;          String recoverMessage = getLocalizedMessage(ABILITY_RECOVER_MESSAGE, AbilityUtils.getUser(update).getLanguageCode());</b>
+<b class="fc">&nbsp;          if (!replyToMsg.equals(recoverMessage))</b>
+&nbsp;            return;
+&nbsp;
+<b class="fc">&nbsp;          String fileId = update.getMessage().getDocument().getFileId();</b>
+<b class="fc">&nbsp;          try (FileReader reader = new FileReader(downloadFileWithId(fileId))) {</b>
+<b class="fc">&nbsp;            String backupData = IOUtils.toString(reader);</b>
+<b class="fc">&nbsp;            if (bot.db.recover(backupData)) {</b>
+<b class="fc">&nbsp;              send(ABILITY_RECOVER_SUCCESS, update);</b>
+&nbsp;            } else {
+<b class="nc">&nbsp;              send(ABILITY_RECOVER_FAIL, update);</b>
+&nbsp;            }
+<b class="fc">&nbsp;          } catch (Exception e) {</b>
+<b class="nc">&nbsp;            log.error(&quot;Could not recover DB from backup&quot;, e);</b>
+<b class="nc">&nbsp;            send(ABILITY_RECOVER_ERROR, update);</b>
+<b class="fc">&nbsp;          }</b>
+&nbsp;        }, MESSAGE, DOCUMENT, REPLY)
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Banned users are accumulated in the blacklist. Use {@link DBContext#getSet(String)} with name specified by {@link BaseAbilityBot#BLACKLIST}.
+&nbsp;   * &lt;p&gt;
+&nbsp;   * Usage: &lt;code&gt;/ban @username&lt;/code&gt;
+&nbsp;   * &lt;p&gt;
+&nbsp;   * &lt;u&gt;Note that admins who try to ban the creator, get banned.&lt;/u&gt;
+&nbsp;   *
+&nbsp;   * @return the ability to ban the user from any kind of &lt;b&gt;bot interaction&lt;/b&gt;
+&nbsp;   */
+&nbsp;  public Ability banUser() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(BAN)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(ADMIN)</b>
+<b class="fc">&nbsp;        .input(1)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String username = stripTag(ctx.firstArg());</b>
+<b class="fc">&nbsp;          long userId = getUserIdSendError(username, ctx);</b>
+&nbsp;          String bannedUser;
+&nbsp;
+&nbsp;          // Protection from abuse
+<b class="fc">&nbsp;          if (userId == bot.creatorId()) {</b>
+<b class="fc">&nbsp;            userId = ctx.user().getId();</b>
+<b class="fc">&nbsp;            bannedUser = isNullOrEmpty(ctx.user().getUserName()) ? addTag(ctx.user().getUserName()) : shortName(ctx.user());</b>
+&nbsp;          } else {
+<b class="fc">&nbsp;            bannedUser = addTag(username);</b>
+&nbsp;          }
+&nbsp;
+<b class="fc">&nbsp;          Set&lt;Long&gt; blacklist = bot.blacklist();</b>
+<b class="fc">&nbsp;          if (blacklist.contains(userId))</b>
+<b class="nc">&nbsp;            sendMd(ABILITY_BAN_FAIL, ctx, escape(bannedUser));</b>
+&nbsp;          else {
+<b class="fc">&nbsp;            blacklist.add(userId);</b>
+<b class="fc">&nbsp;            sendMd(ABILITY_BAN_SUCCESS, ctx, escape(bannedUser));</b>
+&nbsp;          }
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Usage: &lt;code&gt;/unban @username&lt;/code&gt;
+&nbsp;   *
+&nbsp;   * @return the ability to unban a user
+&nbsp;   */
+&nbsp;  public Ability unbanUser() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(UNBAN)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(ADMIN)</b>
+<b class="fc">&nbsp;        .input(1)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String username = stripTag(ctx.firstArg());</b>
+<b class="fc">&nbsp;          Long userId = getUserIdSendError(username, ctx);</b>
+&nbsp;
+<b class="fc">&nbsp;          Set&lt;Long&gt; blacklist = bot.blacklist();</b>
+&nbsp;
+<b class="fc">&nbsp;          if (!blacklist.remove(userId))</b>
+<b class="nc">&nbsp;            bot.silent.sendMd(getLocalizedMessage(ABILITY_UNBAN_FAIL, ctx.user().getLanguageCode(), escape(username)), ctx.chatId());</b>
+&nbsp;          else {
+<b class="fc">&nbsp;            bot.silent.sendMd(getLocalizedMessage(ABILITY_UNBAN_SUCCESS, ctx.user().getLanguageCode(), escape(username)), ctx.chatId());</b>
+&nbsp;          }
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * @return the ability to promote a user to a bot admin
+&nbsp;   */
+&nbsp;  public Ability promoteAdmin() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(PROMOTE)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(ADMIN)</b>
+<b class="fc">&nbsp;        .input(1)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String username = stripTag(ctx.firstArg());</b>
+<b class="fc">&nbsp;          Long userId = getUserIdSendError(username, ctx);</b>
+&nbsp;
+<b class="fc">&nbsp;          Set&lt;Long&gt; admins = bot.admins();</b>
+<b class="fc">&nbsp;          if (admins.contains(userId))</b>
+<b class="nc">&nbsp;            sendMd(ABILITY_PROMOTE_FAIL, ctx, escape(username));</b>
+&nbsp;          else {
+<b class="fc">&nbsp;            admins.add(userId);</b>
+<b class="fc">&nbsp;            sendMd(ABILITY_PROMOTE_SUCCESS, ctx, escape(username));</b>
+&nbsp;          }
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * @return the ability to demote an admin to a user
+&nbsp;   */
+&nbsp;  public Ability demoteAdmin() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(DEMOTE)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(ADMIN)</b>
+<b class="fc">&nbsp;        .input(1)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          String username = stripTag(ctx.firstArg());</b>
+<b class="fc">&nbsp;          Long userId = getUserIdSendError(username, ctx);</b>
+&nbsp;
+<b class="fc">&nbsp;          Set&lt;Long&gt; admins = bot.admins();</b>
+<b class="fc">&nbsp;          if (admins.remove(userId)) {</b>
+<b class="fc">&nbsp;            sendMd(ABILITY_DEMOTE_SUCCESS, ctx, escape(username));</b>
+&nbsp;          } else {
+<b class="nc">&nbsp;            sendMd(ABILITY_DEMOTE_FAIL, ctx, escape(username));</b>
+&nbsp;          }
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Regular users and admins who try to claim the bot will get &lt;b&gt;banned&lt;/b&gt;.
+&nbsp;   *
+&nbsp;   * @return the ability to claim yourself as the master and creator of the bot
+&nbsp;   */
+&nbsp;  public Ability claimCreator() {
+<b class="fc">&nbsp;    return builder()</b>
+<b class="fc">&nbsp;        .name(CLAIM)</b>
+<b class="fc">&nbsp;        .locality(ALL)</b>
+<b class="fc">&nbsp;        .privacy(CREATOR)</b>
+<b class="fc">&nbsp;        .input(0)</b>
+<b class="fc">&nbsp;        .action(ctx -&gt; {</b>
+<b class="fc">&nbsp;          Set&lt;Long&gt; admins = bot.admins();</b>
+<b class="fc">&nbsp;          long id = bot.creatorId();</b>
+&nbsp;
+<b class="fc">&nbsp;          if (admins.contains(id))</b>
+<b class="nc">&nbsp;            send(ABILITY_CLAIM_FAIL, ctx);</b>
+&nbsp;          else {
+<b class="fc">&nbsp;            admins.add(id);</b>
+<b class="fc">&nbsp;            send(ABILITY_CLAIM_SUCCESS, ctx);</b>
+&nbsp;          }
+&nbsp;        })
+<b class="fc">&nbsp;        .build();</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the user with the specified username.
+&nbsp;   *
+&nbsp;   * @param username the username of the required user
+&nbsp;   * @return the user
+&nbsp;   */
+&nbsp;  private User getUser(String username) {
+<b class="fc">&nbsp;    Long id = bot.userIds().get(username.toLowerCase());</b>
+<b class="fc">&nbsp;    if (id == null) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(format(&quot;Could not find ID corresponding to username [%s]&quot;, username));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return getUser(id);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the user with the specified ID.
+&nbsp;   *
+&nbsp;   * @param id the id of the required user
+&nbsp;   * @return the user
+&nbsp;   */
+&nbsp;  private User getUser(long id) {
+<b class="fc">&nbsp;    User user = bot.users().get(id);</b>
+<b class="fc">&nbsp;    if (user == null) {</b>
+<b class="nc">&nbsp;      throw new IllegalStateException(format(&quot;Could not find user corresponding to id [%d]&quot;, id));</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    return user;</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  /**
+&nbsp;   * Gets the user with the specified username. If user was not found, the bot will send a message on Telegram.
+&nbsp;   *
+&nbsp;   * @param username the username of the required user
+&nbsp;   * @param ctx      the message context with the originating user
+&nbsp;   * @return the id of the user
+&nbsp;   */
+&nbsp;  private long getUserIdSendError(String username, MessageContext ctx) {
+&nbsp;    try {
+<b class="fc">&nbsp;      return getUser(username).getId();</b>
+<b class="nc">&nbsp;    } catch (IllegalStateException ex) {</b>
+<b class="nc">&nbsp;      bot.silent.send(getLocalizedMessage(USER_NOT_FOUND, ctx.user().getLanguageCode(), username), ctx.chatId());</b>
+<b class="nc">&nbsp;      throw ex;</b>
+&nbsp;    }
+&nbsp;  }
+&nbsp;
+&nbsp;
+&nbsp;  private Optional&lt;Message&gt; send(String message, MessageContext ctx, String... args) {
+<b class="fc">&nbsp;    return bot.silent.send(getLocalizedMessage(message, ctx.user().getLanguageCode(), args), ctx.chatId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Optional&lt;Message&gt; sendMd(String message, MessageContext ctx, String... args) {
+<b class="fc">&nbsp;    return bot.silent.sendMd(getLocalizedMessage(message, ctx.user().getLanguageCode(), args), ctx.chatId());</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  private Optional&lt;Message&gt; send(String message, Update upd) {
+<b class="fc">&nbsp;    Long chatId = upd.getMessage().getChatId();</b>
+<b class="fc">&nbsp;    return bot.silent.send(getLocalizedMessage(message, AbilityUtils.getUser(upd).getLanguageCode()), chatId);</b>
+&nbsp;  }
+&nbsp;
+&nbsp;  protected File downloadFileWithId(String fileId) throws TelegramApiException {
+<b class="fc">&nbsp;    return bot.sender.downloadFile(bot.sender.execute(GetFile.builder().fileId(fileId).build()));</b>
+&nbsp;  }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2023-10-29 13:12</div>
+</div>
+</body>
+</html>

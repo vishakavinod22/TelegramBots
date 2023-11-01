@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class TelegramHttpClientBuilder {
 
+    //Done AbilityBoyI18Test
     public static CloseableHttpClient build(DefaultBotOptions options) {
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create()
                 .setSSLHostnameVerifier(new NoopHostnameVerifier())
@@ -30,12 +31,15 @@ public class TelegramHttpClientBuilder {
                 .setMaxConnTotal(100);
         return httpClientBuilder.build();
     }
+    //Done AbilityBoyI18Test
 
     private static HttpClientConnectionManager createConnectionManager(DefaultBotOptions options) {
         Registry<ConnectionSocketFactory> registry;
         switch (options.getProxyType()) {
+            //Done AbilityBoyI18Test
             case NO_PROXY:
                 return null;
+            //Done AbilityBoyI18Test
             case HTTP:
                 registry = RegistryBuilder.<ConnectionSocketFactory> create()
                         .register("http", new HttpConnectionSocketFactory())
