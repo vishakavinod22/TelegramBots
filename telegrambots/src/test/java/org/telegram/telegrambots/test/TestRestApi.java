@@ -85,8 +85,8 @@ public class TestRestApi extends JerseyTest {
         Entity<Update> entity = Entity.json(getUpdate());
         BotApiMethod<Message> result =
                 target("callback/testbot")
-                .request(MediaType.APPLICATION_JSON)
-                .post(entity, SendMessage.class);
+                        .request(MediaType.APPLICATION_JSON)
+                        .post(entity, SendMessage.class);
         assertEquals("{\"chat_id\":\"@test\",\"text\":\"Hithere\",\"parse_mode\":\"html\",\"reply_to_message_id\":12,\"reply_markup\":{\"force_reply\":true},\"method\":\"sendmessage\"}", map(result));
     }
 
@@ -113,7 +113,16 @@ public class TestRestApi extends JerseyTest {
                         .request(MediaType.APPLICATION_JSON)
                         .post(entity, AnswerInlineQuery.class);
 
-        assertEquals("{\"inline_query_id\":\"id\",\"results\":[{\"type\":\"article\",\"id\":\"0\",\"title\":\"Title\",\"input_message_content\":{\"message_text\":\"Text\",\"parse_mode\":\"Markdown\"},\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"Button1\",\"callback_data\":\"Callback\"}]]},\"url\":\"Url\",\"hide_url\":false,\"description\":\"Description\",\"thumb_url\":\"ThumbUrl\",\"thumb_width\":10,\"thumb_height\":20},{\"type\":\"photo\",\"id\":\"1\",\"photo_url\":\"PhotoUrl\",\"mime_type\":\"image/jpg\",\"photo_width\":10,\"photo_height\":20,\"thumb_url\":\"ThumbUrl\",\"title\":\"Title\",\"description\":\"Description\",\"caption\":\"Caption\",\"input_message_content\":{\"message_text\":\"Text\",\"parse_mode\":\"Markdown\"},\"reply_markup\":{\"inline_keyboard\":[[{\"text\":\"Button1\",\"callback_data\":\"Callback\"}]]},\"caption_entities\":[]}],\"cache_time\":100,\"is_personal\":true,\"next_offset\":\"3\",\"switch_pm_text\":\"pmText\",\"switch_pm_parameter\":\"PmParameter\",\"method\":\"answerInlineQuery\"}",
+        assertEquals("{\"inline_query_id\":\"id\",\"results\":[{\"type\":\"article\",\"id\":\"0\",\"title\":\"Title\"," +
+                        "\"input_message_content\":{\"message_text\":\"Text\",\"parse_mode\":\"Markdown\"},\"reply_markup\":" +
+                        "{\"inline_keyboard\":[[{\"text\":\"Button1\",\"callback_data\":\"Callback\"}]]},\"url\":\"Url\",\"hide_url\":false," +
+                        "\"description\":\"Description\",\"thumb_url\":\"ThumbUrl\",\"thumb_width\":10,\"thumb_height\":20},{\"type\":\"photo\"," +
+                        "\"id\":\"1\",\"photo_url\":\"PhotoUrl\",\"mime_type\":\"image/jpg\",\"photo_width\":10,\"photo_height\":20," +
+                        "\"thumb_url\":\"ThumbUrl\",\"title\":\"Title\",\"description\":\"Description\",\"caption\":\"Caption\"," +
+                        "\"input_message_content\":{\"message_text\":\"Text\",\"parse_mode\":\"Markdown\"},\"reply_markup\":" +
+                        "{\"inline_keyboard\":[[{\"text\":\"Button1\",\"callback_data\":\"Callback\"}]]},\"caption_entities\":[]}]," +
+                        "\"cache_time\":100,\"is_personal\":true,\"next_offset\":\"3\",\"switch_pm_text\":\"pmText\"," +
+                        "\"switch_pm_parameter\":\"PmParameter\",\"method\":\"answerInlineQuery\"}",
                 map(result));
     }
 
@@ -143,8 +152,8 @@ public class TestRestApi extends JerseyTest {
                         .post(entity, EditMessageReplyMarkup.class);
 
         assertEquals("{\"inline_message_id\":\"12345\",\"reply_markup\":{" +
-                "\"inline_keyboard\":[[{\"text\":\"Button1\"," +
-                "\"callback_data\":\"Callback\"}]]},\"method\":\"editmessagereplymarkup\"}",
+                        "\"inline_keyboard\":[[{\"text\":\"Button1\"," +
+                        "\"callback_data\":\"Callback\"}]]},\"method\":\"editmessagereplymarkup\"}",
                 map(result));
     }
 
