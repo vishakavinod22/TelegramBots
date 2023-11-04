@@ -70,7 +70,7 @@ public abstract class TelegramLongPollingSessionBot extends TelegramLongPollingB
     }
 
     @Override
-    public void onUpdateReceived(Update update) {
+    public final void onUpdateReceived(Update update) {
         Optional<Session> chatSession;
         Message message;
         if (update.hasMessage()) {
