@@ -20,4 +20,16 @@ public class DefaultChatIdConverterTest {
         assertEquals(defaultChatIdConverter.getSessionId(), sessionId);
     }
 
+    @Test
+    /*
+      Tests the positive scenario for setSessionId() method of DefaultChatIdConverter.
+      It sets a dummy value for sessionID, then verifies if the value set by setSessionId() matches the expected value [8].
+     */
+    void positiveTest_setSessionId() {
+        long sessionId = 12345;
+        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
+        defaultChatIdConverter.setSessionId(sessionId);
+        assertEquals(defaultChatIdConverter.getSessionId(), sessionId);
+    }
+
 }
