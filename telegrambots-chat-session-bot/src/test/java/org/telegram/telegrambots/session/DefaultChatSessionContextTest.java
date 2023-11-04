@@ -12,8 +12,33 @@ public class DefaultChatSessionContextTest {
 
     @Test
     /*
+      Tests the getHost() method of DefaultChatSessionContext.
+      It sets a dummy value for sessionID and host, then verifies if the value received by getHost() matches the expected value [8].
+     */
+    void test_getHost(){
+        long sessionId = 12345;
+        String host = "host";
+        DefaultChatSessionContext defaultChatSessionContext = new DefaultChatSessionContext(sessionId, host);
+        assertEquals(defaultChatSessionContext.getHost(), host);
+    }
+
+    @Test
+    /*
+      Tests the positive scenario for setHost() method of DefaultChatSessionContext.
+      It sets a dummy value for sessionID and host, then verifies if the value set by setHost() matches the expected value [8].
+     */
+    void test_setHost() {
+        long sessionId = 12345;
+        String host = "host";
+        DefaultChatSessionContext defaultChatSessionContext = new DefaultChatSessionContext(sessionId, host);
+        defaultChatSessionContext.setHost(host);
+        assertEquals(defaultChatSessionContext.getHost(), host);
+    }
+
+    @Test
+    /*
       Tests the getSessionId() method of DefaultChatSessionContext.
-      It sets a dummy value for sessionID, then verifies if the value received by getSessionId() matches the expected value [8].
+      It sets a dummy value for sessionID and host, then verifies if the value received by getSessionId() matches the expected value [8].
      */
     void test_getSessionId(){
         long sessionId = 12345;
@@ -25,7 +50,7 @@ public class DefaultChatSessionContextTest {
     @Test
     /*
       Tests the positive scenario for setSessionId() method of DefaultChatSessionContext.
-      It sets a dummy value for sessionID, then verifies if the value set by setSessionId() matches the expected value [8].
+      It sets a dummy value for sessionID and host, then verifies if the value set by setSessionId() matches the expected value [8].
      */
     void positiveTest_setSessionId() {
         long sessionId = 12345;
