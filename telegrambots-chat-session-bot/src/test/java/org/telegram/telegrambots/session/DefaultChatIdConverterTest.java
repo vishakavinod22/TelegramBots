@@ -1,8 +1,12 @@
 package org.telegram.telegrambots.session;
 
+import org.apache.shiro.session.Session;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.io.Serializable;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,6 +46,23 @@ public class DefaultChatIdConverterTest {
         int sessionId = 12345;
         DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
         assertThrows(ClassCastException.class, () -> defaultChatIdConverter.setSessionId(sessionId));
+    }
+
+    @Test
+    /*
+      Tests the generateId() method of DefaultChatIdConverter.
+      It sets a dummy value for sessionID, then verifies if generateId() generates the expected value [8].
+     */
+    void test_generateId() {
+        long sessionId = 12345;
+        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
+        defaultChatIdConverter.setSessionId(sessionId);
+
+        // Session is being mocked as it is an external dependency [9]
+        Session session = Mockito.mock(Session.class);
+
+        Serializable generatedId = defaultChatIdConverter.generateId(session);
+        assertEquals(generatedId, sessionId);
     }
 
 }
