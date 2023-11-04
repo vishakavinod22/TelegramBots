@@ -1,19 +1,23 @@
 package org.telegram.telegrambots.session;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.session.Session;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.Serializable;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import static org.junit.jupiter.api.Assertions.*;
-
+@ExtendWith(MockitoExtension.class)
 public class DefaultChatIdConverterTest {
 
     @Test
-    void testDefaultConstructor(){
-        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
-        System.out.println(defaultChatIdConverter);
+    /*
+      Tests the getSessionId() method of DefaultChatIdConverter.
+      It sets a dummy value for sessionID, then verifies if the value received by getSessionId() matches the expected value [8].
+     */
+    void test_getSessionId(){
+        long sessionId = 12345;
+        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter(sessionId);
+        assertEquals(defaultChatIdConverter.getSessionId(), sessionId);
     }
 
 }
