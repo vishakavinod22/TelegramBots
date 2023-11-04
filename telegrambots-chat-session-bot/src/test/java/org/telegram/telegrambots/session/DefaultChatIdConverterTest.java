@@ -8,8 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.Serializable;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultChatIdConverterTest {
@@ -30,7 +29,7 @@ public class DefaultChatIdConverterTest {
       Tests the positive scenario for setSessionId() method of DefaultChatIdConverter.
       It sets a dummy value for sessionID, then verifies if the value set by setSessionId() matches the expected value [8].
      */
-    void positiveTest_setSessionId() {
+    void testPositive_setSessionId() {
         long sessionId = 12345;
         DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
         defaultChatIdConverter.setSessionId(sessionId);
@@ -42,7 +41,7 @@ public class DefaultChatIdConverterTest {
       Tests the negative scenario for setSessionId() method of DefaultChatIdConverter.
       It sets a dummy value for sessionID with wrong datatype, then verifies if setSessionId() throws the ClassCastException exception [8].
      */
-    void negativeTest_setSessionId() {
+    void testNegative_setSessionId() {
         int sessionId = 12345;
         DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
         assertThrows(ClassCastException.class, () -> defaultChatIdConverter.setSessionId(sessionId));
@@ -53,7 +52,7 @@ public class DefaultChatIdConverterTest {
       Tests the generateId() method of DefaultChatIdConverter.
       It sets a dummy value for sessionID, then verifies if generateId() generates the expected value [8].
      */
-    void test_generateId() {
+    void testPositive_generateId() {
         long sessionId = 12345;
         DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
         defaultChatIdConverter.setSessionId(sessionId);
@@ -63,6 +62,19 @@ public class DefaultChatIdConverterTest {
 
         Serializable generatedId = defaultChatIdConverter.generateId(session);
         assertEquals(generatedId, sessionId);
+    }
+
+    @Test
+    void testNegative_generateId() {
+        long sessionId = 12345;
+        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
+        defaultChatIdConverter.setSessionId(sessionId);
+
+        // Session is being mocked as it is an external dependency [9]
+        Session session = Mockito.mock(Session.class);
+
+        Serializable generatedId = defaultChatIdConverter.generateId(session);
+        assertNotEquals(generatedId, "1234");
     }
 
 }
