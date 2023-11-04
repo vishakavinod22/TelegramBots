@@ -5,6 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 public class DefaultChatIdConverterTest {
@@ -30,6 +31,17 @@ public class DefaultChatIdConverterTest {
         DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
         defaultChatIdConverter.setSessionId(sessionId);
         assertEquals(defaultChatIdConverter.getSessionId(), sessionId);
+    }
+
+    @Test
+    /*
+      Tests the negative scenario for setSessionId() method of DefaultChatIdConverter.
+      It sets a dummy value for sessionID with wrong datatype, then verifies if setSessionId() throws the ClassCastException exception [8].
+     */
+    void negativeTest_setSessionId() {
+        int sessionId = 12345;
+        DefaultChatIdConverter defaultChatIdConverter = new DefaultChatIdConverter();
+        assertThrows(ClassCastException.class, () -> defaultChatIdConverter.setSessionId(sessionId));
     }
 
 }
